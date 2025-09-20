@@ -1,0 +1,28 @@
+-- Animation ID (No Spam / No Lag)
+-- Detects all animations but prints each AnimationId only once
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local function trackAnimations(char)
+    local humanoid = char:WaitForChild("Humanoid")
+    local animator = humanoid:FindFirstChildOfClass("Animator") or Instance.new("Animator", humanoid)
+
+    local printed = {} -- store printed AnimationIds
+
+    game:GetService("RunService").RenderStepped:Connect(function()
+        for _, track in pairs(animator:GetPlayingAnimationTracks()) do
+            local anim = track.Animation
+            if anim and anim.AnimationId ~= "" and not printed[anim.AnimationId] then
+                printed[anim.AnimationId] = true
+                warn("🔍 Animation ID : ", anim.Name, anim.AnimationId)
+            end
+        end
+    end)
+end
+
+-- Run on current character + respawn
+if player.Character then
+    trackAnimations(player.Character)
+end
+player.CharacterAdded:Connect(trackAnimations)
